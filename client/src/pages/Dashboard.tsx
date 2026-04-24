@@ -21,7 +21,7 @@ export function Dashboard() {
         <p className="text-sm font-semibold text-primary">Today</p>
         <h2 className="text-3xl font-bold text-slate-950">Forge the next checkpoint</h2>
       </header>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-5">
         {[
           ['Actions', data?.today?.completedActions ?? 0, Target],
           ['Progress', `${data?.overallProgress ?? 0}%`, Gauge],
