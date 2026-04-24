@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 export const connectDb = async () => {
   try {
+    console.log("MONGO_URI:", process.env.MONGO_URI ? "FOUND" : "MISSING");
+
     if (!process.env.MONGO_URI) {
       throw new Error("MONGO_URI is missing");
     }
@@ -11,6 +13,6 @@ export const connectDb = async () => {
     console.log("✅ MongoDB connected");
   } catch (error) {
     console.error("❌ MongoDB connection failed:", error.message);
-    process.exit(1); // force crash with clear log
+    process.exit(1);
   }
 };
