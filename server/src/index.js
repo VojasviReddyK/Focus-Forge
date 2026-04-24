@@ -53,8 +53,17 @@ app.use("/api/calendar", calendarRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use(errorHandler);
 
-connectDb().then(() => {
-  app.listen(port, "0.0.0.0", () => {
-    console.log(`Focus Forge API listening on ${port}`);
-  });
-});
+const startServer = async () => {
+  try {
+    await connectDb();
+
+    app.listen(port, "0.0.0.0", () => {
+      console.log(`🚀 Focus Forge API running on port ${port}`);
+    });
+  } catch (err) {
+    console.error("❌ Server startup failed:", err.message);
+    process.exit(1);
+  }
+};
+
+startServer();
