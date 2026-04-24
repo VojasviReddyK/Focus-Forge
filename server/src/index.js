@@ -5,8 +5,10 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+
 import { connectDb } from "./utils/db.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
+
 import authRoutes from "./routes/auth.routes.js";
 import dsaRoutes from "./routes/dsa.routes.js";
 import systemRoutes from "./routes/system.routes.js";
@@ -17,32 +19,28 @@ import calendarRoutes from "./routes/calendar.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 
 const app = express();
-const port = process.env.PORT || 10000;
 
+// ✅ MUST use Render port
+const PORT = process.env.PORT || 10000;
+
+// Middleware
 app.use(helmet());
-const defaultClientUrl = process.env.CLIENT_URL || "http://localhost:5174";
-const allowedOrigins = Array.from(
-  new Set([
-    defaultClientUrl,
-    ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : []),
-  ]).values(),
-).map((origin) => origin.trim());
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin))
-        return callback(null, true);
-      return callback(new Error(`CORS blocked by origin: ${origin}`));
-    },
-    credentials: true,
-  }),
-);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(morgan("dev"));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 250 }));
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 250 }));
 
+// ✅ SIMPLE CORS (fixes many deploy issues)
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
+
+// Routes
 app.get("/health", (_, res) => res.json({ ok: true, name: "Focus Forge API" }));
+
 app.use("/api/auth", authRoutes);
 app.use("/api/dsa", dsaRoutes);
 app.use("/api/system-design", systemRoutes);
@@ -51,17 +49,22 @@ app.use("/api/posts", postRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/calendar", calendarRoutes);
 app.use("/api/analytics", analyticsRoutes);
+
+// Error handler (must be last)
 app.use(errorHandler);
 
+// ✅ START SERVER SAFELY
 const startServer = async () => {
   try {
     await connectDb();
+    console.log("✅ MongoDB connected");
   } catch (err) {
-    console.error("DB failed, still starting server...");
+    console.error("❌ DB failed:", err.message);
   }
 
-  app.listen(process.env.PORT || 10000, "0.0.0.0", () => {
-    console.log(`🚀 Server running on port ${process.env.PORT || 10000}`);
+  // ✅ ALWAYS start server (Render requirement)
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Server running on port ${PORT}`);
   });
 };
 
