@@ -7,3 +7,5 @@ build/
 .env
 server/.env
 client/.env
+*.log
+*.err
