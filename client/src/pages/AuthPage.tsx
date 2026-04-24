@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { FormEvent, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame } from 'lucide-react';
@@ -9,16 +10,34 @@ export function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, register } = useAuthStore();
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (isSubmitting) return;
+
     setError('');
+    setIsSubmitting(true);
+
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+
     try {
-      if (mode === 'login') await login(email, password);
-      else await register(name, email, password);
-    } catch {
+      if (mode === 'login') await login(trimmedEmail, password);
+      else await register(trimmedName, trimmedEmail, password);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data?.message;
+        if (typeof message === 'string' && message.trim()) {
+          setError(message);
+          return;
+        }
+      }
+
       setError('Could not authenticate. Check your details and try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -32,12 +51,12 @@ export function AuthPage() {
             <p className="text-sm text-slate-500">Gamified job-prep OS</p>
           </div>
         </div>
-        {mode === 'register' && <input className="mb-3 w-full rounded-xl border border-slate-200 px-4 py-3" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />}
-        <input className="mb-3 w-full rounded-xl border border-slate-200 px-4 py-3" placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input className="mb-4 w-full rounded-xl border border-slate-200 px-4 py-3" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        {mode === 'register' && <input className="mb-3 w-full rounded-xl border border-slate-200 px-4 py-3" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required />}
+        <input className="mb-3 w-full rounded-xl border border-slate-200 px-4 py-3" placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
+        <input className="mb-4 w-full rounded-xl border border-slate-200 px-4 py-3" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required />
         {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
-        <button className="w-full rounded-xl bg-primary py-3 font-semibold text-white shadow-soft">{mode === 'login' ? 'Sign in' : 'Create account'}</button>
-        <button type="button" onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="mt-4 w-full text-sm text-primary">
+        <button disabled={isSubmitting} className="w-full rounded-xl bg-primary py-3 font-semibold text-white shadow-soft disabled:cursor-not-allowed disabled:opacity-70">{isSubmitting ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create account'}</button>
+        <button type="button" onClick={() => setMode(mode === 'login' ? 'register' : 'login')} disabled={isSubmitting} className="mt-4 w-full text-sm text-primary disabled:cursor-not-allowed disabled:opacity-70">
           {mode === 'login' ? 'Create a new account' : 'Use an existing account'}
         </button>
       </motion.form>
