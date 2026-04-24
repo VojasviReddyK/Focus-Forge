@@ -7,7 +7,6 @@ import { Dashboard } from './pages/Dashboard';
 import { DSATracker } from './pages/DSATracker';
 import { JobsTracker } from './pages/JobsTracker';
 import { LinkedInHub } from './pages/LinkedInHub';
-import { MernTracker } from './pages/MernTracker';
 import { SystemDesignTracker } from './pages/SystemDesignTracker';
 import { useAuthStore } from './store/authStore';
 
@@ -16,7 +15,7 @@ export default function App() {
   const [page, setPage] = useState('dashboard');
   if (!token) return <AuthPage />;
   const view = {
-    dashboard: <><Dashboard /><div className="mt-5"><MernTracker /></div></>,
+    dashboard: <Dashboard />,
     dsa: <DSATracker />,
     system: <SystemDesignTracker />,
     linkedin: <LinkedInHub />,
