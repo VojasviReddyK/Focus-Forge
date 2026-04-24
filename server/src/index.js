@@ -17,7 +17,7 @@ import calendarRoutes from "./routes/calendar.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 
 const app = express();
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 10000;
 
 app.use(helmet());
 const defaultClientUrl = process.env.CLIENT_URL || "http://localhost:5174";
@@ -56,14 +56,13 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await connectDb();
-
-    app.listen(port, "0.0.0.0", () => {
-      console.log(`🚀 Focus Forge API running on port ${port}`);
-    });
   } catch (err) {
-    console.error("❌ Server startup failed:", err.message);
-    process.exit(1);
+    console.error("DB failed, still starting server...");
   }
+
+  app.listen(process.env.PORT || 10000, "0.0.0.0", () => {
+    console.log(`🚀 Server running on port ${process.env.PORT || 10000}`);
+  });
 };
 
 startServer();
