@@ -37,7 +37,12 @@ Built to reduce context-switching between multiple tools and create a structured
 
 ## 📸 Screenshots
 
-(Add 2–3 screenshots here)
+<img width="1919" height="907" alt="image" src="https://github.com/user-attachments/assets/b728b75b-b3d7-4c79-9f5c-7ae2be82911c" />
+<img width="1900" height="908" alt="image" src="https://github.com/user-attachments/assets/34b609fe-8e0f-4174-aa45-0c9461846be3" />
+<img width="1911" height="909" alt="image" src="https://github.com/user-attachments/assets/dad8be39-108f-42f7-8353-fa0776bfe89a" />
+
+
+
 
 ---
 
